@@ -12,6 +12,7 @@ namespace PomodoroTimer.Models
         private bool _isRunning;
         private bool _isPaused;
         private TimeSpan _remainingTimeOnPause;
+        private TimeSpan _remainingTimeOnResume;
         public event PropertyChangedEventHandler PropertyChanged;
         private System.Timers.Timer _timer;
         public event EventHandler Tick;
@@ -57,6 +58,7 @@ namespace PomodoroTimer.Models
                 return;
 
             IsRunning = true;
+            IsPaused = false;
 
             if (_timer != null)
             {
@@ -67,20 +69,6 @@ namespace PomodoroTimer.Models
             _timer = new System.Timers.Timer(1000);
             _timer.Elapsed += OnTimerElapsed;
 
-            if (!IsPaused)
-            {
-                TimeRemaining = Duration;
-            }
-            else if (IsPaused)
-            {
-                if (_remainingTimeOnPause.TotalMilliseconds > 0)
-                    TimeRemaining = _remainingTimeOnPause;
-                else
-                    TimeRemaining = Duration;
-
-                _remainingTimeOnPause = TimeSpan.Zero;
-            }
-
             _timer.Start();
         }
         public void Pause()
@@ -88,13 +76,13 @@ namespace PomodoroTimer.Models
             if (!IsRunning || IsPaused)
                 return;
 
-            IsPaused = true;
-            _remainingTimeOnPause = TimeRemaining;
-
             if (_timer != null)
                 _timer.Stop();
 
             IsRunning = false;
+            IsPaused = true;
+
+            _remainingTimeOnPause = TimeRemaining;
         }
         public void Reset()
         {
@@ -116,6 +104,9 @@ namespace PomodoroTimer.Models
                 IsRunning = false;
                 IsPaused = false;
             }
+
+            if (IsPaused)
+                _remainingTimeOnPause = TimeRemaining;
 
             OnTick();
         }
