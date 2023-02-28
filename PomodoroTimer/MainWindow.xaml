@@ -10,7 +10,7 @@
     <Grid>
         <Image gif:ImageBehavior.AnimatedSource="Resources/bg.gif"/>
 
-        <TextBlock x:Name="TimeRemainingLabel" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" Margin="0,0,0,125"/>
+        <TextBlock x:Name="TimeRemainingLabel" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" Margin="0,0,0,125" Background="#3F000000"/>
 
         <ProgressBar x:Name="ProgressBar" Value="0" Minimum="0" Maximum="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="10" Visibility="Collapsed"/>
         

@@ -2,6 +2,8 @@
 using System;
 using System.Windows;
 
+#nullable disable
+
 namespace PomodoroTimer
 {
     public partial class MainWindow : Window

@@ -5,6 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\appIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,13 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+    <Content Include="Resources\appIcon.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Lighty.Controls">
-      <HintPath>C:\Users\Envi\.nuget\packages\lighty.controls\1.0.3\lib\net45\Lighty.Controls.dll</HintPath>
-    </Reference>
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>

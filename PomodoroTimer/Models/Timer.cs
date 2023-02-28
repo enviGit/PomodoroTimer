@@ -57,17 +57,28 @@ namespace PomodoroTimer.Models
                 return;
 
             IsRunning = true;
-            IsPaused = false;
 
-            if (_timer == null)
+            if (_timer != null)
             {
-                _timer = new System.Timers.Timer(1000);
-                _timer.Elapsed += OnTimerElapsed;
+                _timer.Stop();
+                _timer.Dispose();
             }
 
-            if (IsPaused)
+            _timer = new System.Timers.Timer(1000);
+            _timer.Elapsed += OnTimerElapsed;
+
+            if (!IsPaused)
             {
-                _timeRemaining = _remainingTimeOnPause;
+                TimeRemaining = Duration;
+            }
+            else if (IsPaused)
+            {
+                if (_remainingTimeOnPause.TotalMilliseconds > 0)
+                    TimeRemaining = _remainingTimeOnPause;
+                else
+                    TimeRemaining = Duration;
+
+                _remainingTimeOnPause = TimeSpan.Zero;
             }
 
             _timer.Start();
@@ -78,11 +89,12 @@ namespace PomodoroTimer.Models
                 return;
 
             IsPaused = true;
+            _remainingTimeOnPause = TimeRemaining;
 
             if (_timer != null)
                 _timer.Stop();
 
-            _remainingTimeOnPause = TimeRemaining;
+            IsRunning = false;
         }
         public void Reset()
         {
@@ -105,7 +117,7 @@ namespace PomodoroTimer.Models
                 IsPaused = false;
             }
 
-            Tick?.Invoke(this, EventArgs.Empty);
+            OnTick();
         }
         private void OnTick()
         {
