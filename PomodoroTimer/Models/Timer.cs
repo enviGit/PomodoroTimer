@@ -12,7 +12,6 @@ namespace PomodoroTimer.Models
         private bool _isRunning;
         private bool _isPaused;
         private TimeSpan _remainingTimeOnPause;
-        private TimeSpan _remainingTimeOnResume;
         public event PropertyChangedEventHandler PropertyChanged;
         private System.Timers.Timer _timer;
         public event EventHandler Tick;

@@ -40,5 +40,13 @@ namespace PomodoroTimer
             TimeSpan remainingTime = timer.TimeRemaining;
             Dispatcher.Invoke(() => TimeRemainingLabel.Text = remainingTime.ToString("mm\\:ss"));
         }
+        /*private void UpdateProgressBar()
+        {
+            ProgressBar.Visibility = Visibility.Visible;
+            TimeSpan totalTime = timer.Duration;
+            TimeSpan remainingTime = timer.TimeRemaining;
+            double progress = (totalTime - remainingTime).TotalSeconds / totalTime.TotalSeconds;
+            Dispatcher.Invoke(() => ProgressBar.Value = progress);
+        }*/
     }
 }

@@ -5,7 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>Resources\appIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Images\appIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\appIcon.ico" />
+    <Content Include="Resources\Images\appIcon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,15 +26,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\appIcon.png" />
-    <Resource Include="Resources\bg.gif" />
-    <Resource Include="Resources\pauseButton.png">
+    <Resource Include="Resources\Images\appIcon.png" />
+    <Resource Include="Resources\Images\bg.gif" />
+    <Resource Include="Resources\Images\pauseButton.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\startButton.png">
+    <Resource Include="Resources\Images\startButton.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\resetButton.png">
+    <Resource Include="Resources\Images\resetButton.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
