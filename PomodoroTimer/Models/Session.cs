@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace PomodoroTimer.Models
 {
-    class Session
+    public class Session
     {
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public bool IsCompleted { get; set; }
+        public TimeSpan Duration { get; set; }
+        public TimeSpan PausedTime { get; set; }
     }
 }

@@ -16,7 +16,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <Grid>
         <Image gif:ImageBehavior.AnimatedSource="Resources/Images/bg.gif" OpacityMask="#D8000000"/>
 
@@ -24,18 +24,19 @@
 
         <ProgressBar x:Name="ProgressBar" Value="0" Minimum="0" Maximum="{Binding TotalSeconds}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="10" 
                      Visibility="Collapsed" />
-        
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
             <Button x:Name="StartButton" Style="{StaticResource startButtonStyle}" Click="StartButton_Click"/>
             <Button x:Name="PauseButton" Style="{StaticResource pauseButtonStyle}" Click="PauseButton_Click"/>
             <Button x:Name="ResetButton" Style="{StaticResource resetButtonStyle}" Click="ResetButton_Click"/>
         </StackPanel>
 
-        <ListBox x:Name="SessionList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Collapsed">
+        <ListBox x:Name="SessionList" Margin="10,255,10,32" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Collapsed">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding}" Margin="5"/>
+                        <TextBlock Text="{Binding StartTime}" Margin="5"/>
+                        <TextBlock Text="{Binding Duration}" Margin="5"/>
                         <!--<Image Source="check.png" Width="16" Height="16" Visibility="{Binding IsCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"/>-->
                     </StackPanel>
                 </DataTemplate>
