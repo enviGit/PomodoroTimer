@@ -67,7 +67,6 @@ namespace PomodoroTimer.Models
 
             _timer = new System.Timers.Timer(1000);
             _timer.Elapsed += OnTimerElapsed;
-
             _timer.Start();
         }
         public void Pause()
@@ -80,7 +79,6 @@ namespace PomodoroTimer.Models
 
             IsRunning = false;
             IsPaused = true;
-
             _remainingTimeOnPause = TimeRemaining;
         }
         public void Reset()
