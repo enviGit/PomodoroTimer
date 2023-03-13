@@ -138,25 +138,29 @@ namespace PomodoroTimer
 
             if (session != null)
             {
-                Sessions.Remove(session);
-                string json = JsonConvert.SerializeObject(Sessions, Formatting.Indented);
-                File.WriteAllText("sessions.json", json);
-                SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
-            }
-            else
-            {
-                ClearSessionsButton.Visibility = Visibility.Collapsed;
-                SessionHeaders.Visibility = Visibility.Collapsed;
-                SessionList.Visibility = Visibility.Collapsed;
+                MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this session?", 
+                    "Confirm deletion", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    Sessions.Remove(session);
+                    string json = JsonConvert.SerializeObject(Sessions, Formatting.Indented);
+                    File.WriteAllText("sessions.json", json);
+                    SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
+                }
             }
         }
         private void ClearSessionsButton_Click(object sender, RoutedEventArgs e)
         {
-            Sessions.Clear();
-            File.WriteAllText("sessions.json", "");
-            ClearSessionsButton.Visibility = Visibility.Collapsed;
-            SessionHeaders.Visibility = Visibility.Collapsed;
-            SessionList.Visibility = Visibility.Collapsed;
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to permanently delete all your sessions? This action cannot be undone!", 
+                "Confirm deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Sessions.Clear();
+                File.WriteAllText("sessions.json", "");
+                SessionList.ItemsSource = null;
+            }
         }
     }
 }

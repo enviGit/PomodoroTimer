@@ -39,8 +39,8 @@
             <Button x:Name="ResetButton" Style="{StaticResource resetButtonStyle}" Click="ResetButton_Click"/>
         </StackPanel>
 
-        <Button x:Name="ClearSessionsButton" Content="Remove sessions" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearSessionsButton_Click" Margin="0,35,0,0" 
-                Visibility="Collapsed"/>
+        <Button x:Name="ClearSessionsButton" Content="Remove all sessions" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearSessionsButton_Click" Margin="0,35,0,0" 
+                Style="{StaticResource clearSessionsButtonStyle}" Visibility="Collapsed"/>
 
         <StackPanel x:Name="SessionHeaders" Margin="10,245,10,41" Orientation="Horizontal" Visibility="Collapsed">
             <TextBlock Text="Completion time" Margin="5,-10,5,5" FontWeight="Bold"/>
