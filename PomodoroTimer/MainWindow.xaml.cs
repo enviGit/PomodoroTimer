@@ -32,8 +32,6 @@ namespace PomodoroTimer
         {
             if (timer.IsRunning)
                 return;
-            if (currentSession != null && !currentSession.IsCompleted)
-                currentSession.PausedTime += currentSession.Duration - timer.TimeRemaining;
 
             timer.Start();
             TimeRemainingLabel.Visibility = Visibility.Visible;
@@ -44,24 +42,22 @@ namespace PomodoroTimer
         }
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentSession == null)
+            currentSession = new Session
             {
-                currentSession = new Session
-                {
-                    StartTime = DateTime.Now,
-                    Duration = timer.Duration - timer.TimeRemaining,
-                    PausedTime = TimeSpan.Zero
-                };
+                EndTime = DateTime.Now,
+                Duration = timer.Duration - timer.TimeRemaining
+            };
+
+            if (currentSession.Duration != TimeSpan.Zero)
                 Sessions.Add(currentSession);
-                SessionList.Visibility = Visibility.Visible;
-            }
 
             timer.Reset();
             UpdateTimeRemainingLabel();
+            SessionHeaders.Visibility = Visibility.Visible;
+            SessionList.Visibility = Visibility.Visible;
             TimeRemainingLabel.Visibility = Visibility.Collapsed;
             ProgressBar.Visibility = Visibility.Collapsed;
             ProgressBar.Value = 0;
-            currentSession.EndTime = DateTime.Now;
             currentSession = null;
             SessionList.ItemsSource = Sessions;
             SessionList.Visibility = Visibility.Visible;
@@ -76,22 +72,17 @@ namespace PomodoroTimer
 
                 if (timer.TimeRemaining == TimeSpan.Zero)
                 {
-                    if (currentSession == null)
+                    currentSession = new Session
                     {
-                        currentSession = new Session
-                        {
-                            StartTime = DateTime.Now,
-                            Duration = timer.Duration,
-                            PausedTime = TimeSpan.Zero
-                        };
-                        Sessions.Add(currentSession);
-                        SessionList.Visibility = Visibility.Visible;
-                    }
-
+                        EndTime = DateTime.Now,
+                        Duration = timer.Duration
+                    };
+                    Sessions.Add(currentSession);
+                    SessionHeaders.Visibility = Visibility.Visible;
+                    SessionList.Visibility = Visibility.Visible;
                     ProgressBar.Visibility = Visibility.Collapsed;
                     timer.Reset();
                     TimeRemainingLabel.Text = "";
-                    currentSession.EndTime = DateTime.Now;
                     currentSession = null;
                     SessionList.ItemsSource = Sessions;
                     SessionList.Visibility = Visibility.Visible;
