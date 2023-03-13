@@ -19,12 +19,11 @@ The Pomodoro technique is a time management method that involves breaking work i
 3. Run the PomodoroTimer.exe file.
 
 ## Usage
-1. Set the duration for the work session and the break session using the up and down arrows next to the respective labels.
-2. Click the "Start" button to start the timer.
-3. Pause or reset the timer as needed using the corresponding buttons.
-4. View the remaining time for the current session in the timer area.
-5. Once a session is completed, it will be added to the list of completed sessions below.
-6. The progress bar at the bottom of the window will show the overall progress of the current session.
+1. Click the "Start" button to start the timer.
+2. Pause or reset the timer as needed using the corresponding buttons.
+3. View the remaining time for the current session in the timer area.
+4. Once a session is completed, it will be added to the list of completed sessions below.
+5. The progress bar at the bottom of the window will show the overall progress of the current session.
 
 ## Development
 To build and run the project locally, follow these steps:
