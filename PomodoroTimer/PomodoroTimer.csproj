@@ -12,6 +12,7 @@
     <None Remove="appIcon.png" />
     <None Remove="Resources\appIcon.png" />
     <None Remove="Resources\bg.gif" />
+    <None Remove="Resources\Images\removeButton.png" />
     <None Remove="Resources\pauseButton.png" />
     <None Remove="Resources\resetButton.png" />
     <None Remove="Resources\startButton.png" />
@@ -32,6 +33,7 @@
     <Resource Include="Resources\Images\pauseButton.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Images\removeButton.png" />
     <Resource Include="Resources\Images\startButton.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>

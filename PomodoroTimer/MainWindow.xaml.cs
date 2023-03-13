@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
 using PomodoroTimer.Models;
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Effects;
 using System.Windows.Threading;
 
@@ -22,10 +24,18 @@ namespace PomodoroTimer
         {
             InitializeComponent();
 
+            TimeSpan duration = TimeSpan.FromMinutes(25);
+            timer = new Timer(duration);
+            timer.Tick += Timer_Tick;
+            ProgressBar.Maximum = duration.TotalSeconds;
+
             if (File.Exists("sessions.json"))
             {
                 string json = File.ReadAllText("sessions.json");
                 var sessionListItems = JsonConvert.DeserializeObject<List<Session>>(json);
+
+                if (sessionListItems == null) 
+                    return;
 
                 foreach (var sessionListItem in sessionListItems)
                 {
@@ -37,15 +47,12 @@ namespace PomodoroTimer
                     Sessions.Add(session);
                 }
 
-                SessionList.ItemsSource = Sessions;
+                ClearSessionsButton.Visibility = Visibility.Visible;
+                SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
                 SessionHeaders.Visibility = Visibility.Visible;
                 SessionList.Visibility = Visibility.Visible;
             }
 
-            TimeSpan duration = TimeSpan.FromMinutes(25);
-            timer = new Timer(duration);
-            timer.Tick += Timer_Tick;
-            ProgressBar.Maximum = duration.TotalSeconds;
         }
         public ObservableCollection<Session> Sessions
         {
@@ -76,18 +83,17 @@ namespace PomodoroTimer
                 Sessions.Add(currentSession);
 
             bgImg.Effect = new BlurEffect { Radius = 0 };
-            bgImg.Opacity = 1;
             string json = JsonConvert.SerializeObject(Sessions, Formatting.Indented);
             File.WriteAllText("sessions.json", json);
             timer.Reset();
             UpdateTimeRemainingLabel();
             SessionHeaders.Visibility = Visibility.Visible;
-            SessionList.Visibility = Visibility.Visible;
             TimeRemainingLabel.Visibility = Visibility.Collapsed;
             ProgressBar.Visibility = Visibility.Collapsed;
             ProgressBar.Value = 0;
             currentSession = null;
-            SessionList.ItemsSource = Sessions;
+            SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
+            ClearSessionsButton.Visibility = Visibility.Visible;
             SessionList.Visibility = Visibility.Visible;
         }
         private void Timer_Tick(object sender, EventArgs e)
@@ -95,7 +101,6 @@ namespace PomodoroTimer
             Dispatcher.Invoke(() =>
             {
                 bgImg.Effect = new BlurEffect { Radius = 20 };
-                bgImg.Opacity = 0.8;
                 UpdateTimeRemainingLabel();
                 ProgressBar.Visibility = Visibility.Visible;
                 ProgressBar.Value = (timer.Duration - timer.TimeRemaining).TotalSeconds;
@@ -109,16 +114,15 @@ namespace PomodoroTimer
                     };
                     Sessions.Add(currentSession);
                     bgImg.Effect = new BlurEffect { Radius = 0 };
-                    bgImg.Opacity = 1;
                     string json = JsonConvert.SerializeObject(Sessions, Formatting.Indented);
                     File.WriteAllText("sessions.json", json);
                     timer.Reset();
                     SessionHeaders.Visibility = Visibility.Visible;
-                    SessionList.Visibility = Visibility.Visible;
                     ProgressBar.Visibility = Visibility.Collapsed;
                     TimeRemainingLabel.Text = "";
                     currentSession = null;
-                    SessionList.ItemsSource = Sessions;
+                    SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
+                    ClearSessionsButton.Visibility = Visibility.Visible;
                     SessionList.Visibility = Visibility.Visible;
                 }
             });
@@ -127,6 +131,32 @@ namespace PomodoroTimer
         {
             TimeSpan remainingTime = timer.TimeRemaining;
             Dispatcher.Invoke(() => TimeRemainingLabel.Text = remainingTime.ToString("mm\\:ss"));
+        }
+        private void DeleteSessionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var session = (sender as Button)?.DataContext as Session;
+
+            if (session != null)
+            {
+                Sessions.Remove(session);
+                string json = JsonConvert.SerializeObject(Sessions, Formatting.Indented);
+                File.WriteAllText("sessions.json", json);
+                SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
+            }
+            else
+            {
+                ClearSessionsButton.Visibility = Visibility.Collapsed;
+                SessionHeaders.Visibility = Visibility.Collapsed;
+                SessionList.Visibility = Visibility.Collapsed;
+            }
+        }
+        private void ClearSessionsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Sessions.Clear();
+            File.WriteAllText("sessions.json", "");
+            ClearSessionsButton.Visibility = Visibility.Collapsed;
+            SessionHeaders.Visibility = Visibility.Collapsed;
+            SessionList.Visibility = Visibility.Collapsed;
         }
     }
 }

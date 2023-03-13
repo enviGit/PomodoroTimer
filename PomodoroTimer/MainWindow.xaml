@@ -13,6 +13,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/ButtonsStyle.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/ProgressBarStyle.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/ScrollBarStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -27,28 +28,33 @@
             </Image.OpacityMask>
         </Image>
 
-        <TextBlock x:Name="TimeRemainingLabel" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" FontWeight="Bold" Margin="0,0,0,125"/>
+        <TextBlock x:Name="TimeRemainingLabel" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" FontWeight="Bold" Margin="0,0,0,225"/>
 
         <ProgressBar x:Name="ProgressBar" Value="0" Minimum="0" Maximum="{Binding TotalSeconds}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="10" 
                      Visibility="Collapsed" />
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,60">
             <Button x:Name="StartButton" Style="{StaticResource startButtonStyle}" Click="StartButton_Click"/>
             <Button x:Name="PauseButton" Style="{StaticResource pauseButtonStyle}" Click="PauseButton_Click"/>
             <Button x:Name="ResetButton" Style="{StaticResource resetButtonStyle}" Click="ResetButton_Click"/>
         </StackPanel>
 
-        <StackPanel x:Name="SessionHeaders" Margin="10,246,10,41" Orientation="Horizontal" Visibility="Collapsed" Width="215">
+        <Button x:Name="ClearSessionsButton" Content="Remove sessions" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearSessionsButton_Click" Margin="0,35,0,0" 
+                Visibility="Collapsed"/>
+
+        <StackPanel x:Name="SessionHeaders" Margin="10,245,10,41" Orientation="Horizontal" Visibility="Collapsed">
             <TextBlock Text="Completion time" Margin="5,-10,5,5" FontWeight="Bold"/>
-            <TextBlock Text="Duration" Margin="50,-10,5,5" FontWeight="Bold"/>
+            <TextBlock Text="Duration" Margin="53,-10,5,5" FontWeight="Bold"/>
+            <TextBlock Text="Usuń" Margin="40,-10,5,5" FontWeight="Bold"/>
         </StackPanel>
-        
+
         <ListBox x:Name="SessionList" Margin="10,255,10,32" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Collapsed">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Margin="0">
-                        <TextBlock Text="{Binding EndTimeString}" Margin="43,0,5,0"/>
-                        <TextBlock Text="{Binding DurationString}" Margin="57,0,0,0"/>
+                        <TextBlock Text="{Binding EndTimeString}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding DurationString}" Margin="47,0,0,0" VerticalAlignment="Center"/>
+                        <Button x:Name="RemoveButton" Margin="50,0,0,0" Style="{StaticResource removeButtonStyle}" Click="DeleteSessionButton_Click"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
