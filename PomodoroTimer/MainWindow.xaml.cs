@@ -1,6 +1,7 @@
 ﻿using PomodoroTimer.Models;
 using System;
 using System.Windows;
+using System.Windows.Threading;
 
 #nullable disable
 
@@ -17,10 +18,12 @@ namespace PomodoroTimer
             TimeSpan duration = TimeSpan.FromMinutes(25);
             timer = new Timer(duration);
             timer.Tick += Timer_Tick;
+            ProgressBar.Maximum = duration.TotalSeconds;
         }
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             timer.Start();
+            TimeRemainingLabel.Visibility = Visibility.Visible;
         }
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
@@ -30,23 +33,26 @@ namespace PomodoroTimer
         {
             timer.Reset();
             UpdateTimeRemainingLabel();
+            TimeRemainingLabel.Visibility = Visibility.Collapsed;
+            ProgressBar.Visibility = Visibility.Collapsed;
+            ProgressBar.Value = 0;
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            UpdateTimeRemainingLabel();
+            Dispatcher.Invoke(() => 
+            {
+                UpdateTimeRemainingLabel();
+                ProgressBar.Visibility = Visibility.Visible;
+                ProgressBar.Value = (timer.Duration - timer.TimeRemaining).TotalSeconds;
+
+                if (timer.TimeRemaining == TimeSpan.Zero)
+                    ProgressBar.Visibility = Visibility.Collapsed;
+            });
         }
         private void UpdateTimeRemainingLabel()
         {
             TimeSpan remainingTime = timer.TimeRemaining;
             Dispatcher.Invoke(() => TimeRemainingLabel.Text = remainingTime.ToString("mm\\:ss"));
         }
-        /*private void UpdateProgressBar()
-        {
-            ProgressBar.Visibility = Visibility.Visible;
-            TimeSpan totalTime = timer.Duration;
-            TimeSpan remainingTime = timer.TimeRemaining;
-            double progress = (totalTime - remainingTime).TotalSeconds / totalTime.TotalSeconds;
-            Dispatcher.Invoke(() => ProgressBar.Value = progress);
-        }*/
     }
 }

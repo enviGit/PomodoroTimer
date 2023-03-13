@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/ButtonsStyle.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/ProgressBarStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -21,7 +22,8 @@
 
         <TextBlock x:Name="TimeRemainingLabel" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" Margin="0,0,0,125" Background="#3F000000"/>
 
-        <ProgressBar x:Name="ProgressBar" Value="0" Minimum="0" Maximum="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="10" Visibility="Collapsed"/>
+        <ProgressBar x:Name="ProgressBar" Value="0" Minimum="0" Maximum="{Binding TotalSeconds}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="10" 
+                     Visibility="Collapsed" />
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
             <Button x:Name="StartButton" Style="{StaticResource startButtonStyle}" Click="StartButton_Click"/>
