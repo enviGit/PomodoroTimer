@@ -28,6 +28,9 @@ namespace PomodoroTimer
             timer = new Timer(duration);
             timer.Tick += Timer_Tick;
             ProgressBar.Maximum = duration.TotalSeconds;
+            ClearSessionsButton.Visibility = Visibility.Visible;
+            SessionHeaders.Visibility = Visibility.Visible;
+            SessionList.Visibility = Visibility.Visible;
 
             if (File.Exists("sessions.json"))
             {
@@ -46,13 +49,9 @@ namespace PomodoroTimer
                     };
                     Sessions.Add(session);
                 }
-
-                ClearSessionsButton.Visibility = Visibility.Visible;
+                
                 SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
-                SessionHeaders.Visibility = Visibility.Visible;
-                SessionList.Visibility = Visibility.Visible;
             }
-
         }
         public ObservableCollection<Session> Sessions
         {
