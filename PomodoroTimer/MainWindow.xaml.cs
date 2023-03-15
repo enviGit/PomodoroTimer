@@ -17,6 +17,9 @@ namespace PomodoroTimer
     public partial class MainWindow : Window
     {
         private Timer timer;
+        private Timer breakTimer;
+        private int breakTimeCountdown = 4;
+        private Timer breakTimerCountdown;
         private ObservableCollection<Session> _sessions = new ObservableCollection<Session>();
         private Session currentSession;
 
@@ -27,6 +30,12 @@ namespace PomodoroTimer
             TimeSpan duration = TimeSpan.FromMinutes(25);
             timer = new Timer(duration);
             timer.Tick += Timer_Tick;
+            TimeSpan breakDuration = TimeSpan.FromMinutes(5);
+            breakTimer = new Timer(breakDuration);
+            breakTimer.Tick += BreakTimer_Tick;
+            TimeSpan breakCountdownDuration = TimeSpan.FromSeconds(4);
+            breakTimerCountdown = new Timer(breakCountdownDuration);
+            breakTimerCountdown.Tick += breakTimerCountdown_Tick;
             ProgressBar.Maximum = duration.TotalSeconds;
             ClearSessionsButton.Visibility = Visibility.Visible;
             SessionHeaders.Visibility = Visibility.Visible;
@@ -37,7 +46,7 @@ namespace PomodoroTimer
                 string json = File.ReadAllText("sessions.json");
                 var sessionListItems = JsonConvert.DeserializeObject<List<Session>>(json);
 
-                if (sessionListItems == null) 
+                if (sessionListItems == null)
                     return;
 
                 foreach (var sessionListItem in sessionListItems)
@@ -49,7 +58,7 @@ namespace PomodoroTimer
                     };
                     Sessions.Add(session);
                 }
-                
+
                 SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
             }
         }
@@ -64,10 +73,14 @@ namespace PomodoroTimer
                 return;
 
             timer.Start();
+            BreakTimeLabel.Visibility = Visibility.Visible;
             TimeRemainingLabel.Visibility = Visibility.Visible;
         }
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
+            if (timer.IsPaused)
+                return;
+
             timer.Pause();
         }
         private void ResetButton_Click(object sender, RoutedEventArgs e)
@@ -87,6 +100,7 @@ namespace PomodoroTimer
             timer.Reset();
             UpdateTimeRemainingLabel();
             SessionHeaders.Visibility = Visibility.Visible;
+            BreakTimeLabel.Visibility = Visibility.Collapsed;
             TimeRemainingLabel.Visibility = Visibility.Collapsed;
             ProgressBar.Visibility = Visibility.Collapsed;
             ProgressBar.Value = 0;
@@ -100,6 +114,7 @@ namespace PomodoroTimer
             Dispatcher.Invoke(() =>
             {
                 bgImg.Effect = new BlurEffect { Radius = 20 };
+                BreakTimeLabel.Text = "Timer";
                 UpdateTimeRemainingLabel();
                 ProgressBar.Visibility = Visibility.Visible;
                 ProgressBar.Value = (timer.Duration - timer.TimeRemaining).TotalSeconds;
@@ -116,19 +131,60 @@ namespace PomodoroTimer
                     string json = JsonConvert.SerializeObject(Sessions, Formatting.Indented);
                     File.WriteAllText("sessions.json", json);
                     timer.Reset();
+                    TimeRemainingLabel.Text = "";
                     SessionHeaders.Visibility = Visibility.Visible;
                     ProgressBar.Visibility = Visibility.Collapsed;
-                    TimeRemainingLabel.Text = "";
                     currentSession = null;
                     SessionList.ItemsSource = Sessions.OrderByDescending(x => x.EndTime);
                     ClearSessionsButton.Visibility = Visibility.Visible;
                     SessionList.Visibility = Visibility.Visible;
+                    breakTimerCountdown.Start();
+                }
+            });
+        }
+        private void BreakTimer_Tick(object sender, EventArgs e)
+        {
+            TimeSpan remainingTime = breakTimer.TimeRemaining;
+
+            Dispatcher.Invoke(() =>
+            {
+                bgImg.Effect = new BlurEffect { Radius = 20 };
+                BreakTimeLabel.Text = "Break timer";
+                TimeRemainingLabel.Text = remainingTime.ToString("mm\\:ss");
+
+                if (breakTimer.TimeRemaining == TimeSpan.Zero)
+                {
+                    breakTimer.Reset();
+                    TimeRemainingLabel.Text = "";
+                    BreakTimeLabel.Text = "";
+                    BreakTimeLabel.Visibility = Visibility.Collapsed;
+                    MessageBox.Show("Your break session has ended!", "Break session ended", MessageBoxButton.OK, MessageBoxImage.Information);
+                    bgImg.Effect = new BlurEffect { Radius = 0 };
+                }
+            });
+        }
+        private void breakTimerCountdown_Tick(object sender, EventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                bgImg.Effect = new BlurEffect { Radius = 20 };
+                breakTimeCountdown--;
+                BreakTimeLabel.Text = "Your break starts in " + breakTimeCountdown;
+
+                if (breakTimeCountdown == 0)
+                {
+                    breakTimerCountdown.Reset();
+                    bgImg.Effect = new BlurEffect { Radius = 0 };
+                    breakTimeCountdown = 4;
+                    BreakTimeLabel.Text = "";
+                    breakTimer.Start();
                 }
             });
         }
         private void UpdateTimeRemainingLabel()
         {
             TimeSpan remainingTime = timer.TimeRemaining;
+
             Dispatcher.Invoke(() => TimeRemainingLabel.Text = remainingTime.ToString("mm\\:ss"));
         }
         private void DeleteSessionButton_Click(object sender, RoutedEventArgs e)
@@ -137,7 +193,7 @@ namespace PomodoroTimer
 
             if (session != null)
             {
-                MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this session?", 
+                MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this session?",
                     "Confirm deletion", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (result == MessageBoxResult.Yes)
@@ -151,7 +207,7 @@ namespace PomodoroTimer
         }
         private void ClearSessionsButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to permanently delete all your sessions? This action cannot be undone!", 
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to permanently delete all your sessions? This action cannot be undone!",
                 "Confirm deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
