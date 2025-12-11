@@ -6,9 +6,10 @@ using PomodoroTimer.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Media;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Shell;
 
 namespace PomodoroTimer.ViewModels
 {
@@ -17,14 +18,19 @@ namespace PomodoroTimer.ViewModels
         private readonly PomodoroEngine _timer = new();
         private readonly SessionService _sessionService = new();
 
+        [ObservableProperty] private int _workMinutes = 25;
+        [ObservableProperty] private int _breakMinutes = 5;
+
+        [ObservableProperty] private bool _isSettingsOpen;
         [ObservableProperty] private string _timerText = "25:00";
         [ObservableProperty] private double _progressValue = 0;
         [ObservableProperty] private double _progressMax = 1;
+        [ObservableProperty] private TaskbarItemProgressState _taskbarState = TaskbarItemProgressState.None;
+
         [ObservableProperty] private bool _isBreakMode;
         [ObservableProperty] private ObservableCollection<Session> _sessions = new();
         [ObservableProperty] private bool _isTimerRunning;
 
-        // Konstruktor
         public MainViewModel()
         {
             _timer.Tick += (s, time) =>
@@ -36,17 +42,42 @@ namespace PomodoroTimer.ViewModels
             _timer.Finished += (s, e) =>
             {
                 IsTimerRunning = false;
+                TaskbarState = TaskbarItemProgressState.Error;
+                ProgressValue = ProgressMax;
+                SystemSounds.Exclamation.Play();
+
                 if (!IsBreakMode) CompleteSession();
                 else StartWorkMode();
             };
 
             LoadData();
+            UpdateTimerDisplay();
         }
 
         private async void LoadData()
         {
             Sessions = await _sessionService.LoadSessionsAsync();
             Sessions = new ObservableCollection<Session>(Sessions.OrderByDescending(s => s.EndTime));
+        }
+
+
+        [RelayCommand]
+        private void ChangeSetting(string typeAndAmount)
+        {
+            var parts = typeAndAmount.Split(':');
+            string type = parts[0];
+            int amount = int.Parse(parts[1]);
+
+            if (type == "Work")
+            {
+                WorkMinutes = Math.Clamp(WorkMinutes + amount, 5, 120);
+                if (!IsBreakMode) UpdateTimerDisplay();
+            }
+            else if (type == "Break")
+            {
+                BreakMinutes = Math.Clamp(BreakMinutes + amount, 1, 60);
+                if (IsBreakMode) UpdateTimerDisplay();
+            }
         }
 
         [RelayCommand]
@@ -56,26 +87,50 @@ namespace PomodoroTimer.ViewModels
             {
                 _timer.Pause();
                 IsTimerRunning = false;
+                TaskbarState = TaskbarItemProgressState.Paused;
             }
             else
             {
-                if (_timer.TotalDuration == TimeSpan.Zero || _timerText == "25:00" && !_timer.IsRunning)
-                    _timer.Start(TimeSpan.FromMinutes(IsBreakMode ? 5 : 25));
-                else
-                    _timer.Resume();
+                IsSettingsOpen = false;
 
-                ProgressMax = _timer.TotalDuration.TotalSeconds;
+                if (!_timer.IsRunning && ProgressValue == 0)
+                {
+                    int minutes = IsBreakMode ? BreakMinutes : WorkMinutes;
+                    _timer.Start(TimeSpan.FromMinutes(minutes));
+                    ProgressMax = _timer.TotalDuration.TotalSeconds;
+                }
+                else
+                {
+                    _timer.Resume();
+                }
+
                 IsTimerRunning = true;
+                TaskbarState = TaskbarItemProgressState.Normal;
             }
+        }
+
+        [RelayCommand]
+        private void ToggleSettings()
+        {
+            IsSettingsOpen = !IsSettingsOpen;
         }
 
         [RelayCommand]
         private void Reset()
         {
+            UpdateTimerDisplay();
+        }
+
+        private void UpdateTimerDisplay()
+        {
             _timer.Stop();
             IsTimerRunning = false;
-            TimerText = IsBreakMode ? "05:00" : "25:00";
+            TaskbarState = TaskbarItemProgressState.None;
             ProgressValue = 0;
+
+            int minutes = IsBreakMode ? BreakMinutes : WorkMinutes;
+            TimerText = $"{minutes:00}:00";
+            ProgressMax = minutes * 60;
         }
 
         [RelayCommand]
@@ -105,19 +160,17 @@ namespace PomodoroTimer.ViewModels
             await _sessionService.SaveSessionsAsync(Sessions);
 
             IsBreakMode = true;
-            TimerText = "05:00";
-            ProgressValue = 0;
-            ProgressMax = 300;
-
-            MessageBox.Show("Czas na przerwę!", "Koniec pracy", MessageBoxButton.OK, MessageBoxImage.Information);
+            UpdateTimerDisplay();
+            MessageBox.Show("Dobra robota! Czas na przerwę.", "Pomodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+            TaskbarState = TaskbarItemProgressState.None;
         }
 
         private void StartWorkMode()
         {
             IsBreakMode = false;
-            TimerText = "25:00";
-            ProgressValue = 0;
-            MessageBox.Show("Wracamy do pracy!", "Koniec przerwy", MessageBoxButton.OK, MessageBoxImage.Information);
+            UpdateTimerDisplay();
+            MessageBox.Show("Koniec przerwy! Wracamy do pracy.", "Pomodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+            TaskbarState = TaskbarItemProgressState.None;
         }
     }
 }

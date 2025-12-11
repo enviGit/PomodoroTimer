@@ -5,12 +5,11 @@
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>Resources\Images\appIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\appIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="appIcon.png" />
-    <None Remove="Resources\appIcon.png" />
     <None Remove="Resources\bg.gif" />
     <None Remove="Resources\pauseButton.png" />
     <None Remove="Resources\resetButton.png" />
@@ -18,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Images\appIcon.ico" />
+    <Content Include="Resources\appIcon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,10 +29,6 @@
     <None Update="sessions.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\Styles\" />
   </ItemGroup>
 
   <ItemGroup>
