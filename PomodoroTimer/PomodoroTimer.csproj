@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources\Images\appIcon.ico</ApplicationIcon>
@@ -12,7 +12,6 @@
     <None Remove="appIcon.png" />
     <None Remove="Resources\appIcon.png" />
     <None Remove="Resources\bg.gif" />
-    <None Remove="Resources\Images\removeButton.png" />
     <None Remove="Resources\pauseButton.png" />
     <None Remove="Resources\resetButton.png" />
     <None Remove="Resources\startButton.png" />
@@ -23,29 +22,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Resources\Images\appIcon.png" />
-    <Resource Include="Resources\Images\bg.gif" />
-    <Resource Include="Resources\Images\pauseButton.png">
-      <CopyToOutputDirectory></CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\removeButton.png" />
-    <Resource Include="Resources\Images\startButton.png">
-      <CopyToOutputDirectory></CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\resetButton.png">
-      <CopyToOutputDirectory></CopyToOutputDirectory>
-    </Resource>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="sessions.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Styles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="appIcon.png" />
   </ItemGroup>
 
 </Project>

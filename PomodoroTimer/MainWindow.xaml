@@ -1,72 +1,115 @@
 ﻿<Window x:Class="PomodoroTimer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:gif="http://wpfanimatedgif.codeplex.com"
-        xmlns:local="clr-namespace:PomodoroTimer"
-        mc:Ignorable="d"
-        Title="Pomodoro Timer" Height="450" Width="350" Icon="Resources/Images/appIcon.png" ResizeMode="CanMinimize">
+        xmlns:vm="clr-namespace:PomodoroTimer.ViewModels"
+        xmlns:conv="clr-namespace:PomodoroTimer.Converters"  Title="Pomodoro Timer" Height="600" Width="400"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize"
+        Background="#1E1E2E" Icon="/appIcon.png">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
 
     <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles/ButtonsStyle.xaml"/>
-                <ResourceDictionary Source="Resources/Styles/ProgressBarStyle.xaml"/>
-                <ResourceDictionary Source="Resources/Styles/ScrollBarStyle.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <conv:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <conv:ModeColorConverter x:Key="ModeColorConverter"/>
+        <conv:PlayPauseTextConverter x:Key="PlayPauseTextConverter"/>
+
+        <Style TargetType="Button" x:Key="ModernBtn">
+            <Setter Property="Background" Value="#FF6B6B"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.95" ScaleY="0.95" CenterX="0.5" CenterY="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
-    <Grid>
-        <Image x:Name="bgImg" gif:ImageBehavior.AnimatedSource="Resources/Images/bg.gif">
-            <Image.OpacityMask>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black"/>
-                    <GradientStop Color="#5F000000" Offset="0.55"/>
-                </LinearGradientBrush>
-            </Image.OpacityMask>
-        </Image>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <TextBlock x:Name="BreakTimeLabel" Text="" TextAlignment="Center" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="45" 
-                   Margin="0,10,0,0" Width="330" Height="126" Visibility="Collapsed">
-            <TextBlock.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FFA66767" Offset="1"/>
-                    <GradientStop Color="#5FFF0000"/>
-                </LinearGradientBrush>
-            </TextBlock.Background>
-        </TextBlock>
-        <TextBlock x:Name="TimeRemainingLabel" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" FontWeight="Bold" Margin="0,0,0,225"/>
+        <Border Grid.Row="0" Background="#2D2D44" CornerRadius="20" Padding="20" Margin="0,0,0,20">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="0.3"/>
+            </Border.Effect>
+            <StackPanel>
+                <TextBlock Text="{Binding IsBreakMode, Converter={StaticResource BoolToStringConverter}, FallbackValue='FOCUS TIME'}" 
+                           Foreground="#A0A0A0" HorizontalAlignment="Center" FontSize="14"/>
 
-        <ProgressBar x:Name="ProgressBar" Value="0" Minimum="0" Maximum="{Binding TotalSeconds}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="10" 
-                     Visibility="Collapsed" />
+                <TextBlock Text="{Binding TimerText}" 
+                           Foreground="{Binding IsBreakMode, Converter={StaticResource ModeColorConverter}}" 
+                           FontSize="72" FontWeight="Bold" HorizontalAlignment="Center"/>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,60">
-            <Button x:Name="StartButton" Style="{StaticResource startButtonStyle}" Click="StartButton_Click"/>
-            <Button x:Name="PauseButton" Style="{StaticResource pauseButtonStyle}" Click="PauseButton_Click"/>
-            <Button x:Name="ResetButton" Style="{StaticResource resetButtonStyle}" Click="ResetButton_Click"/>
+                <ProgressBar Value="{Binding ProgressValue}" Maximum="{Binding ProgressMax}" 
+                             Height="6" BorderThickness="0" Background="#3E3E5E" Foreground="#FF6B6B" 
+                             Margin="0,10,0,0">
+                    <ProgressBar.Clip>
+                        <RectangleGeometry Rect="0,0,320,6" RadiusX="3" RadiusY="3"/>
+                    </ProgressBar.Clip>
+                </ProgressBar>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+            <Button Command="{Binding ToggleTimerCommand}" Content="{Binding IsTimerRunning, Converter={StaticResource PlayPauseTextConverter}}" 
+                    Style="{StaticResource ModernBtn}" Width="120" Margin="0,0,10,0"/>
+
+            <Button Command="{Binding ResetCommand}" Content="Reset" 
+                    Style="{StaticResource ModernBtn}" Background="#4D4D64" Width="80"/>
         </StackPanel>
 
-        <Button x:Name="ClearSessionsButton" Content="Remove all sessions" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearSessionsButton_Click" Margin="0,35,0,0" 
-                Style="{StaticResource clearSessionsButtonStyle}" Visibility="Collapsed"/>
+        <TextBlock Grid.Row="2" Text="Ostatnie Sesje" Foreground="White" FontWeight="SemiBold" Margin="5,0,0,10"/>
 
-        <StackPanel x:Name="SessionHeaders" Margin="10,245,10,41" Orientation="Horizontal" Visibility="Collapsed">
-            <TextBlock Text="Completion time" Margin="5,-10,5,5" FontWeight="Bold"/>
-            <TextBlock Text="Duration" Margin="53,-10,5,5" FontWeight="Bold"/>
-            <TextBlock Text="Remove" Margin="40,-10,5,5" FontWeight="Bold"/>
-        </StackPanel>
-
-        <ListBox x:Name="SessionList" Margin="10,255,10,32" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Collapsed">
+        <ListBox Grid.Row="2" ItemsSource="{Binding Sessions}" Background="Transparent" BorderThickness="0" Margin="0,20,0,0">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Margin="0">
-                        <TextBlock Text="{Binding EndTimeString}" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding DurationString}" Margin="47,0,0,0" VerticalAlignment="Center"/>
-                        <Button x:Name="RemoveButton" Margin="50,0,0,0" Style="{StaticResource removeButtonStyle}" Click="DeleteSessionButton_Click"/>
-                    </StackPanel>
+                    <Border Background="#2D2D44" CornerRadius="8" Padding="10" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Sesja Pracy" Foreground="White" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding EndTimeString}" Foreground="#808080" FontSize="12"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{Binding DurationString}" Foreground="#FF6B6B" VerticalAlignment="Center" Margin="10,0"/>
+
+                            <Button Grid.Column="2" Command="{Binding DataContext.DeleteSessionCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                    CommandParameter="{Binding}" Content="✕" Background="Transparent" Foreground="#555" BorderThickness="0"/>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <Button Grid.Row="3" Command="{Binding ClearAllCommand}" Content="Wyczyść Historię" 
+                Background="Transparent" Foreground="#FF6B6B" BorderThickness="0" Margin="0,10,0,0"/>
     </Grid>
 </Window>
