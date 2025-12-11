@@ -28,8 +28,8 @@ Designed to help you focus on work and manage breaks efficiently, wrapped in a b
 
 ## 📦 Installation
 
-1.  Go to the [Releases](https://github.com/twoj-nick/repo/releases) page.
-2.  Download the latest `Pomodoro Timer.zip`.
+1.  Go to the [Releases](https://github.com/enviGit/PomodoroTimer/releases/latest) page.
+2.  Download the latest `PomodoroTimer.zip`.
 3.  Extract and run `PomodoroTimer.exe`.
 
 ## 📂 Project Structure
@@ -39,7 +39,7 @@ Designed to help you focus on work and manage breaks efficiently, wrapped in a b
 * **`Services/`**: Handles data persistence (`SessionService`).
 * **`Core/`**: The heart of the timer logic (`PomodoroEngine`).
 * **`Converters/`**: XAML value converters for dynamic UI updates.
-* **`Resources/`**: IconS.
+* **`Resources/`**: Icons.
 
 ## 📄 License
 
