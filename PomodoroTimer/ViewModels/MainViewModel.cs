@@ -31,6 +31,10 @@ namespace PomodoroTimer.ViewModels
         [ObservableProperty] private ObservableCollection<Session> _sessions = new();
         [ObservableProperty] private bool _isTimerRunning;
 
+        [ObservableProperty] private bool _isDialogVisible;
+        [ObservableProperty] private string _dialogMessage;
+        private Action _dialogConfirmAction;
+
         public MainViewModel()
         {
             _timer.Tick += (s, time) =>
@@ -44,7 +48,7 @@ namespace PomodoroTimer.ViewModels
                 IsTimerRunning = false;
                 TaskbarState = TaskbarItemProgressState.Error;
                 ProgressValue = ProgressMax;
-                SystemSounds.Exclamation.Play();
+                SystemSounds.Asterisk.Play();
 
                 if (!IsBreakMode) CompleteSession();
                 else StartWorkMode();
@@ -60,6 +64,25 @@ namespace PomodoroTimer.ViewModels
             Sessions = new ObservableCollection<Session>(Sessions.OrderByDescending(s => s.EndTime));
         }
 
+        [RelayCommand]
+        private void ConfirmDialog()
+        {
+            _dialogConfirmAction?.Invoke();
+            IsDialogVisible = false;
+        }
+
+        [RelayCommand]
+        private void CancelDialog()
+        {
+            IsDialogVisible = false;
+        }
+
+        private void ShowDialog(string message, Action onConfirm)
+        {
+            DialogMessage = message;
+            _dialogConfirmAction = onConfirm;
+            IsDialogVisible = true;
+        }
 
         [RelayCommand]
         private void ChangeSetting(string typeAndAmount)
@@ -136,21 +159,21 @@ namespace PomodoroTimer.ViewModels
         [RelayCommand]
         private async Task DeleteSession(Session session)
         {
-            if (MessageBox.Show("Usunąć sesję?", "Potwierdzenie", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            ShowDialog("Delete this session?", async () =>
             {
                 Sessions.Remove(session);
                 await _sessionService.SaveSessionsAsync(Sessions);
-            }
+            });
         }
 
         [RelayCommand]
         private async Task ClearAll()
         {
-            if (MessageBox.Show("Usunąć wszystko?", "Potwierdzenie", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            ShowDialog("Delete ALL history?", async () =>
             {
                 Sessions.Clear();
                 await _sessionService.SaveSessionsAsync(Sessions);
-            }
+            });
         }
 
         private async void CompleteSession()
@@ -161,7 +184,6 @@ namespace PomodoroTimer.ViewModels
 
             IsBreakMode = true;
             UpdateTimerDisplay();
-            MessageBox.Show("Dobra robota! Czas na przerwę.", "Pomodoro", MessageBoxButton.OK, MessageBoxImage.Information);
             TaskbarState = TaskbarItemProgressState.None;
         }
 
@@ -169,7 +191,6 @@ namespace PomodoroTimer.ViewModels
         {
             IsBreakMode = false;
             UpdateTimerDisplay();
-            MessageBox.Show("Koniec przerwy! Wracamy do pracy.", "Pomodoro", MessageBoxButton.OK, MessageBoxImage.Information);
             TaskbarState = TaskbarItemProgressState.None;
         }
     }

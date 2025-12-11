@@ -11,9 +11,9 @@ namespace PomodoroTimer.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool isBreak && isBreak)
-                return "CZAS NA PRZERWĘ ☕";
+                return "BREAK TIME ☕";
 
-            return "CZAS SKUPIENIA 🔥";
+            return "FOCUS TIME 🔥";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
